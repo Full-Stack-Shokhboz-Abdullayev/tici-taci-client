@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { FC, memo, useRef } from 'react';
 
 import O from '../assets/images/o.svg';
 import X from '../assets/images/x.svg';
@@ -11,6 +11,9 @@ interface SquareProps {
 }
 
 const Square: FC<SquareProps> = ({ value, onClick, index }) => {
+  const renders = useRef(0);
+  console.log(renders.current++);
+
   return (
     <div
       onClick={() => onClick(index)}

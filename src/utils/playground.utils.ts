@@ -21,7 +21,7 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
       } = calculateWinner(moves);
 
       return {
-        winner: winner.endsWith('o.svg') ? 'O' : winner.endsWith('x.svg') ? 'X' : winner,
+        winner,
         line: winner && winner !== 'tie' ? line : {},
         cells: moves,
         xIsNext: !state.xIsNext,

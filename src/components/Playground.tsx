@@ -59,6 +59,12 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
           cells,
           xIsNext,
         });
+        playgroundDispatch({
+          type: 'mark',
+          payload: {
+            idx: i,
+          },
+        });
       }
     },
     [cells, socket],
