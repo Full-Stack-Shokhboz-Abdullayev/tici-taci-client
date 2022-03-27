@@ -52,9 +52,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
 
   const mark = useCallback(
     (i: number) => {
-      console.log(i);
-      console.log(xIsNext, cells);
-      if (!winner) {
+      if (!winner && !cells[i]) {
         socket?.emit('move', {
           code,
           idx: i,
