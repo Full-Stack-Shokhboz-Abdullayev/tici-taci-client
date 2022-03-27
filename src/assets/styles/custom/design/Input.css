@@ -1,0 +1,14 @@
+.custom-input-black {
+  @apply border-2 border-black;
+}
+.custom-input-yellow {
+  @apply border-2 border-light-yellow;
+}
+
+.custom-input-yellow:focus {
+  box-shadow: 0 0 0 3px var(--light-yellow-06);
+}
+
+.custom-input-black:focus {
+  box-shadow: 0 0 0 3px var(--black-06);
+}

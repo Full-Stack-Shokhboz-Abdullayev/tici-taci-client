@@ -1,0 +1,68 @@
+.playground-content::before {
+  --sqrt2: 1.41421356237;
+  position: absolute;
+  content: '';
+  height: 6px;
+  background-color: rgba(0, 0, 0, 1);
+  width: 0;
+}
+
+.line-diagonal::before,
+.line-horizontal::before,
+.line-vertical::before {
+  transition: width 0.3s;
+}
+
+.line-diagonal::before {
+  width: calc(var(--sqrt2) * 100%);
+  top: -3px;
+}
+
+.line-diagonal.line-left::before {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 0%;
+}
+
+.line-diagonal.line-right::before {
+  right: 0;
+  transform: rotate(-45deg);
+  transform-origin: 100%;
+}
+
+.line-vertical::before {
+  top: -3px;
+  width: 100%;
+  transform-origin: 0%;
+  transform: rotate(90deg);
+}
+
+.line-vertical.line-1::before {
+  left: calc((100% / 6) * 1);
+}
+
+.line-vertical.line-2::before {
+  left: calc((100% / 6) * 3);
+}
+
+.line-vertical.line-3::before {
+  left: calc((100% / 6) * 5);
+}
+
+.line-horizontal::before {
+  left: 0;
+  width: 100%;
+  transform-origin: 0%;
+}
+
+.line-horizontal.line-1::before {
+  top: calc((100% / 6) * 1);
+}
+
+.line-horizontal.line-2::before {
+  top: calc((100% / 6) * 3);
+}
+
+.line-horizontal.line-3::before {
+  top: calc((100% / 6) * 5);
+}

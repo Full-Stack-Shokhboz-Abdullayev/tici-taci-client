@@ -1,0 +1,22 @@
+.custom-button-black {
+  background-color: #000 !important;
+  color: #fff;
+}
+
+.custom-button-black.active {
+  box-shadow: 0 0 0 2px var(--black);
+  background: #fff !important;
+  color: #000 !important;
+}
+
+.custom-button-yellow {
+  @apply bg-light-yellow !important;
+  color: #000;
+}
+
+.custom-button-yellow:hover {
+  box-shadow: 0 0 0 1px var(--black);
+}
+.custom-button-yellow:active {
+  box-shadow: 0 0 0 3px var(--black-06);
+}

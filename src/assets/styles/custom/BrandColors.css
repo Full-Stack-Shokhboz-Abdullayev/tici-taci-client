@@ -1,0 +1,17 @@
+:root {
+  --light-yellow: rgb(252, 227, 138);
+  --light-yellow-06: rgba(252, 227, 138, 0.6);
+  --black: black;
+  --black-06: rgba(0, 0, 0, 0.6);
+}
+
+.bg-light-yellow {
+  background-color: var(--light-yellow) !important;
+}
+.border-light-yellow {
+  border-color: var(--light-yellow) !important;
+}
+
+.border-light-black {
+  border-color: var(--light-yellow) !important;
+}

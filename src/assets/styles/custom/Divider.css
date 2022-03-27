@@ -1,0 +1,64 @@
+.or {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: black;
+  font-size: 0.75em;
+  margin: 4em auto;
+}
+
+.or::before,
+.or::after {
+  content: '';
+}
+.or.vertical {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+.or.vertical {
+  height: 2rem;
+  --line-height: 50px;
+}
+.or.vertical::before,
+.or.vertical::after {
+  position: absolute;
+  background: var(--light-yellow);
+  width: 1px;
+  height: var(--line-height);
+  left: 50%;
+  margin-left: -1px;
+}
+.or.vertical::before {
+  top: calc(-1 * var(--line-height));
+}
+.or.vertical::after {
+  bottom: calc(-1 * var(--line-height));
+}
+
+@media (max-width: 768px) {
+  .or {
+    margin: 0 4em;
+  }
+  .or.vertical::before,
+  .or.vertical::after {
+    width: var(--line-height);
+    height: 1px;
+    margin-left: -1px;
+    left: unset;
+  }
+  .or.vertical::before {
+    top: unset;
+    left: calc(-1 * var(--line-height));
+  }
+  .or.vertical::after {
+    bottom: unset;
+    right: calc(-1 * var(--line-height));
+  }
+  .or.vertical {
+    width: 2rem;
+    height: auto;
+    --line-height: 50px;
+  }
+}
