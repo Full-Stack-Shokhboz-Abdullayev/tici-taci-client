@@ -19,7 +19,6 @@ const JoinGame: FC = () => {
     socket?.on('check-complete', (game: JoinGameDto) => {
       if (game) {
         check(game);
-        console.log('Game', game);
 
         open();
       }

@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useReducer } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { defaultPlaygroundState } from '../constants/Playground';
 import { useSocket } from '../contexts/SocketProvider';
@@ -17,7 +17,7 @@ import Message from './Playground/Message';
 import Square from './Square';
 
 const Playground: FC<PlaygroundProps> = ({ className }) => {
-  const { players, join, code: storedCode, check } = useGameStore();
+  const { players, join, code: storedCode, check, opponentLeft } = useGameStore();
   const [{ cells, line, winner, xIsNext }, playgroundDispatch] = useReducer(
     playgroundReducer,
     defaultPlaygroundState,
@@ -26,55 +26,68 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
   const { code } = useParams() as { code: string };
   const { open } = useModal(<JoinGameForm />);
 
-  useEffect(() => {
-    socket?.on('move-complete', (state: PlaygroundState) => {
-      console.log(state);
+  const navigate = useNavigate();
 
-      playgroundDispatch({ type: 'move', payload: state });
-    });
-    if (storedCode) {
+  useEffect(() => {
+    if (socket) {
+      socket?.on('opponent-left', (game: JoinGameDto) => {
+        opponentLeft(game);
+        playgroundDispatch({ type: 'start' });
+      });
+      socket?.on('move-complete', (state: PlaygroundState) => {
+        playgroundDispatch({ type: 'move', payload: state });
+      });
+      socket?.on('restart-made', () => {
+        playgroundDispatch({ type: 'start' });
+      });
+      socket?.on('check-complete', (game: JoinGameDto | { error: boolean }) => {
+        if (game && !(game as { error: boolean }).error) {
+          check(game as JoinGameDto);
+          open();
+          return;
+        }
+
+        navigate('/');
+      });
       socket?.on('player-joined', (game: JoinGameDto) => {
         join(game.joiner);
       });
-      socket?.on('disconnect', () => {
-        socket.emit('leave', { code });
-      });
-    } else {
-      socket?.on('check-complete', (game: JoinGameDto) => {
-        if (game) {
-          check(game);
-          open();
-        }
-      });
-      socket?.emit('check', { code });
+      if (!storedCode) {
+        socket?.emit('check', { code });
+        console.log('checking', socket);
+      }
     }
-  }, [socket]);
+  }, [socket, storedCode]);
 
   const mark = useCallback(
     (i: number) => {
       if (!winner && !cells[i]) {
+        playgroundDispatch({
+          type: 'mark',
+          payload: {
+            idx: i,
+            localSign: players.local?.sign,
+          },
+        });
         socket?.emit('move', {
           code,
           idx: i,
           cells,
           xIsNext,
         });
-        playgroundDispatch({
-          type: 'mark',
-          payload: {
-            idx: i,
-          },
-        });
       }
     },
-    [cells, socket],
+    [socket, cells, playgroundDispatch],
   );
 
   const restart = useCallback(() => {
-    playgroundDispatch({
-      type: 'start',
-    });
-  }, [playgroundDispatch]);
+    if (winner) {
+      socket?.emit('restart', { code });
+      playgroundDispatch({
+        type: 'start',
+      });
+    }
+  }, [playgroundDispatch, storedCode, winner]);
 
   return (
     <div className={`${className} playground-container`}>
@@ -93,8 +106,8 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
           ))}
         </div>
       </div>
-      {!players.remote && <p className="text-center">Waiting for the opponent to join</p>}
-      <Message winner={winner} restart={restart} players={players} />
+
+      <Message xIsNext={xIsNext} winner={winner} restart={restart} players={players} />
     </div>
   );
 };

@@ -18,6 +18,7 @@ interface Actions {
   join: (player: PlayerDto) => void;
   check: (game: Partial<JoinGameDto>) => Promise<void>;
   remove: (code: string) => Promise<void>;
+  opponentLeft: (game: Partial<JoinGameDto>) => void;
 }
 
 const useGameStore = create<State & Actions>((set) => ({
@@ -56,6 +57,22 @@ const useGameStore = create<State & Actions>((set) => ({
           ...state.players,
           local: joiner,
           remote: maker,
+        },
+      };
+    });
+  },
+
+  opponentLeft({ code, joiner, maker, title }) {
+    // joiner left -> joiner = null
+    // maker left -> maker = joiner -> joiner = null
+    set((state) => {
+      return {
+        ...state,
+        title,
+        code,
+        players: {
+          local: maker,
+          remote: joiner,
         },
       };
     });
