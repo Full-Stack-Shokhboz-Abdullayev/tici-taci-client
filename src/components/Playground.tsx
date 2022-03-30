@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useReducer } from 'react';
+import { FC, useCallback, useEffect, useReducer, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { defaultPlaygroundState } from '../constants/Playground';
@@ -26,6 +26,8 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
   const { code } = useParams() as { code: string };
   const { open } = useModal(<JoinGameForm />);
 
+  const [canMove, setCanMove] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,6 +38,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
       });
       socket?.on('move-complete', (state: PlaygroundState) => {
         playgroundDispatch({ type: 'move', payload: state });
+        setCanMove(true);
       });
       socket?.on('restart-made', () => {
         playgroundDispatch({ type: 'start' });
@@ -57,11 +60,11 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         console.log('checking', socket);
       }
     }
-  }, [socket, storedCode]);
+  }, [socket, storedCode, canMove]);
 
   const mark = useCallback(
     (i: number) => {
-      if (!winner && !cells[i]) {
+      if (!winner && !cells[i] && canMove) {
         playgroundDispatch({
           type: 'mark',
           payload: {
@@ -75,9 +78,10 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
           cells,
           xIsNext,
         });
+        setCanMove(false);
       }
     },
-    [socket, cells, playgroundDispatch],
+    [socket, cells, playgroundDispatch, canMove],
   );
 
   const restart = useCallback(() => {
@@ -93,7 +97,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
     <div className={`${className} playground-container`}>
       <div className="relative ">
         {(!players.remote ||
-          ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner)) && (
+          ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner && canMove)) && (
           <div className="flex justify-center items-center absolute w-full h-full z-30 bg-opacity-80 bg-white">
             <Loading show={true} />
           </div>
