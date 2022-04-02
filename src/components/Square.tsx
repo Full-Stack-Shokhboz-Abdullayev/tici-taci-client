@@ -19,11 +19,9 @@ const Square: FC<SquareProps> = ({ value, onClick, index }) => {
       onClick={() => onClick(index)}
       onKeyDown={() => onClick(index)}
       role="presentation"
-      className={`grid-item w-40 h-40 flex justify-center items-center border-2 text-xl`}
+      className={`grid-item xsm:w-32 xsm:h-32 h-20 w-20 sm:w-40 sm:h-40 flex justify-center items-center border-2 text-xl`}
     >
-      {value && (
-        <img className="w-20 h-20 " src={value === 'X' ? X : O} alt="tic-tac-toe-icon" />
-      )}
+      {value && <img className="w-1/2 h-1/2" src={value === 'X' ? X : O} alt={value} />}
     </div>
   );
 };

@@ -20,7 +20,7 @@ const Modal: FC = () => {
       <div
         onClick={(e) => e.stopPropagation()}
         role="presentation"
-        className="modal relative w-1/3 h-auto bg-light-yellow rounded-md p-6"
+        className="modal relative sm:w-3/5 md:w-2/3 lg:w-1/3 w-11/12 h-auto bg-light-yellow rounded-md sm:p-6 p-4"
       >
         <button
           onClick={close}

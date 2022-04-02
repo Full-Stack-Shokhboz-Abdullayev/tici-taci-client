@@ -17,7 +17,14 @@ import Message from './Playground/Message';
 import Square from './Square';
 
 const Playground: FC<PlaygroundProps> = ({ className }) => {
-  const { players, join, code: storedCode, check, opponentLeft } = useGameStore();
+  const {
+    players,
+    join,
+    code: storedCode,
+    check,
+    opponentLeft,
+    updateScores,
+  } = useGameStore();
   const [{ cells, line, winner, xIsNext }, playgroundDispatch] = useReducer(
     playgroundReducer,
     defaultPlaygroundState,
@@ -36,8 +43,9 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         opponentLeft(game);
         playgroundDispatch({ type: 'start' });
       });
-      socket?.on('move-complete', (state: PlaygroundState) => {
+      socket?.on('move-complete', ({ scores, ...state }: PlaygroundState) => {
         playgroundDispatch({ type: 'move', payload: state });
+        updateScores(scores);
         setCanMove(true);
       });
       socket?.on('restart-made', () => {
@@ -57,14 +65,13 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
       });
       if (!storedCode) {
         socket?.emit('check', { code });
-        console.log('checking', socket);
       }
     }
   }, [socket, storedCode, canMove]);
 
   const mark = useCallback(
     (i: number) => {
-      if (!winner && !cells[i] && canMove) {
+      if (!winner && !cells[i] && canMove && socket) {
         playgroundDispatch({
           type: 'mark',
           payload: {
@@ -95,10 +102,10 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
 
   return (
     <div className={`${className} playground-container`}>
-      <div className="relative ">
+      <div className="relative">
         {(!players.remote ||
           ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner && canMove)) && (
-          <div className="flex justify-center items-center absolute w-full h-full z-30 bg-opacity-80 bg-white">
+          <div className="flex justify-center items-center absolute w-full h-full z-30 bac bg-opacity-80 bg-white">
             <Loading show={true} />
           </div>
         )}

@@ -5,4 +5,5 @@ export const defaultPlaygroundState: PlaygroundState = {
   xIsNext: true,
   winner: null,
   line: {},
+  scores: {},
 };

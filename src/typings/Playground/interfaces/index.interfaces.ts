@@ -13,4 +13,7 @@ export interface PlaygroundState {
   xIsNext: boolean;
   winner: Nullish<string>;
   line: Partial<Line['line']>;
+  scores: {
+    [key: string]: number;
+  };
 }

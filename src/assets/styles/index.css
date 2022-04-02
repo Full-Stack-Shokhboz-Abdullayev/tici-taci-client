@@ -2,3 +2,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (min-width: 470px) {
+  .xsm\:w-32 {
+    width: 8rem;
+  }
+  .xsm\:w-32 {
+    height: 8rem;
+  }
+}

@@ -9,7 +9,10 @@ const NavBar: FC = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      <a href="https://shox-pro.netlify.app" className="hover:text-lg transition-all">
+      <a
+        href="https://shox-pro.netlify.app"
+        className="hover:text-lg transition-all sm:visible invisible"
+      >
         Who made this?
       </a>
     </nav>

@@ -42,21 +42,22 @@ const CreateGameForm: FC = () => {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    if (socket && name.value && title.value && selectedSign) {
+      socket?.emit('create', {
+        title: title.value,
+        maker: {
+          name: name.value,
+          sign: selectedSign,
+        },
+      });
 
-    socket?.emit('create', {
-      title: title.value,
-      maker: {
-        name: name.value,
-        sign: selectedSign,
-      },
-    });
-
-    socket?.on('create-complete', (data: CreateGameDto) => {
-      create(data);
-      setIsOpen(false);
-      clearData();
-      navigate('/game/' + data.code);
-    });
+      socket?.on('create-complete', (data: CreateGameDto) => {
+        create(data);
+        setIsOpen(false);
+        clearData();
+        navigate('/game/' + data.code);
+      });
+    }
   };
 
   return (

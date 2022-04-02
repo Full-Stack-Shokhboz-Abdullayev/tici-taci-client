@@ -50,11 +50,18 @@ const Message: FC<MessageProps> = ({ winner, restart, players, xIsNext }) => {
       }
       return '';
     }, [players, winner]);
+    console.log(winnerPlayer);
 
     return (
       <div className="flex justify-center mt-2 flex-col">
         <p className="text-xl text-center">
-          {(winner as unknown) === 'tie' ? 'Tie!' : winnerPlayer + ' won!'}
+          {(winner as unknown) === 'tie' ? (
+            <span className="font-bold">Tie!</span>
+          ) : (
+            <>
+              <span className="font-bold">{winnerPlayer}</span> won!
+            </>
+          )}
         </p>
         <Button styleType="yellow" className="my-2" onClick={restart}>
           Restart

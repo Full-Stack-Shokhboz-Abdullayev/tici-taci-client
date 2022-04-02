@@ -1,7 +1,7 @@
 import create from 'zustand';
 
-import useAxios from '../config/axios.config';
 import { PlayersState } from '../typings/Playground/interfaces/index.interfaces';
+import { PlayerType } from '../typings/Playground/types/player.type';
 import { CreateGameDto } from '../typings/shared/dto/create-game.dto';
 import { JoinGameDto } from '../typings/shared/dto/join-game.dto';
 import { PlayerDto } from '../typings/shared/dto/player.dto';
@@ -13,12 +13,14 @@ interface State {
   players: Partial<PlayersState>;
 }
 
+type Scores = { [key: string]: number };
+
 interface Actions {
-  create: (payload: CreateGameDto) => Promise<State>;
+  create: (payload: CreateGameDto) => void;
   join: (player: PlayerDto) => void;
-  check: (game: Partial<JoinGameDto>) => Promise<void>;
-  remove: (code: string) => Promise<void>;
+  check: (game: Partial<JoinGameDto>) => void;
   opponentLeft: (game: Partial<JoinGameDto>) => void;
+  updateScores(scores: Scores): void;
 }
 
 const useGameStore = create<State & Actions>((set) => ({
@@ -26,10 +28,9 @@ const useGameStore = create<State & Actions>((set) => ({
   code: '',
   players: {},
 
-  async create({ title, maker: { sign, name }, code }) {
-    let updatedState: any;
+  async create({ title, maker: { sign, name, score }, code }) {
     set((state) => {
-      updatedState = {
+      return {
         ...state,
         title,
         code,
@@ -38,13 +39,11 @@ const useGameStore = create<State & Actions>((set) => ({
           local: {
             name,
             sign,
+            score,
           },
         },
       };
-
-      return updatedState;
     });
-    return updatedState;
   },
 
   async check({ code, joiner, maker, title }) {
@@ -63,8 +62,6 @@ const useGameStore = create<State & Actions>((set) => ({
   },
 
   opponentLeft({ code, joiner, maker, title }) {
-    // joiner left -> joiner = null
-    // maker left -> maker = joiner -> joiner = null
     set((state) => {
       return {
         ...state,
@@ -90,14 +87,22 @@ const useGameStore = create<State & Actions>((set) => ({
     }));
   },
 
-  async remove(code: string) {
-    await useAxios.delete('/game?code=' + code).catch(console.log);
-    set((state) => ({
-      ...state,
-      title: '',
-      code: '',
-      players: {},
-    }));
+  updateScores(scores) {
+    set((state) => {
+      if (state.players.local?.name && state.players.remote?.name) {
+        const players = {} as PlayersState;
+
+        Object.keys(state.players).forEach((key) => {
+          players[key as PlayerType] = {
+            ...(state.players[key as PlayerType] as PlayerDto),
+            score: scores[(state.players[key as PlayerType] as PlayerDto).name],
+          } as PlayerDto;
+        });
+
+        return { ...state, players };
+      }
+      return state;
+    });
   },
 }));
 

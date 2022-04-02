@@ -13,7 +13,7 @@ const RouterContext: FC<{ navbar?: JSX.Element; footer?: JSX.Element }> = ({
     <Router>
       <Modal></Modal>
       {navbar}
-      <div className="container px-10 sm:px-20 md:40 lg:px-60">
+      <div className="container sm:min-w-full px-10 sm:px-20 md:px-30 lg:px-60">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/game/:code" element={<GamePage />} />
