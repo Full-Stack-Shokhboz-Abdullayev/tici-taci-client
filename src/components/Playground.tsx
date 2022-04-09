@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useReducer, useState } from 'react';
+import { FC, useCallback, useEffect, useReducer } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { defaultPlaygroundState } from '../constants/Playground';
@@ -11,10 +11,10 @@ import {
 } from '../typings/Playground/interfaces/index.interfaces';
 import { JoinGameDto } from '../typings/shared/dto/join-game.dto';
 import { playgroundReducer } from '../utils/playground.utils';
-import Loading from './design/Loading';
 import JoinGameForm from './JoinGame/JoinGameForm';
+import Fallback from './Playground/Fallback';
 import Message from './Playground/Message';
-import Square from './Square';
+import SquaresGrid from './Playground/SquaresGrid';
 
 const Playground: FC<PlaygroundProps> = ({ className }) => {
   const {
@@ -25,7 +25,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
     opponentLeft,
     updateScores,
   } = useGameStore();
-  const [{ cells, line, winner, xIsNext }, playgroundDispatch] = useReducer(
+  const [{ cells, line, winner, xIsNext, canMove }, playgroundDispatch] = useReducer(
     playgroundReducer,
     defaultPlaygroundState,
   );
@@ -33,89 +33,84 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
   const { code } = useParams() as { code: string };
   const { open } = useModal(<JoinGameForm />);
 
-  const [canMove, setCanMove] = useState(true);
-
   const navigate = useNavigate();
 
   useEffect(() => {
     if (socket) {
-      socket?.on('opponent-left', (game: JoinGameDto) => {
-        opponentLeft(game);
-        playgroundDispatch({ type: 'start' });
-      });
-      socket?.on('move-complete', ({ scores, ...state }: PlaygroundState) => {
-        playgroundDispatch({ type: 'move', payload: state });
-        updateScores(scores);
-        setCanMove(true);
-      });
-      socket?.on('restart-made', () => {
-        playgroundDispatch({ type: 'start' });
-      });
-      socket?.on('check-complete', (game: JoinGameDto | { error: boolean }) => {
-        if (game && !(game as { error: boolean }).error) {
-          check(game as JoinGameDto);
-          open();
-          return;
-        }
+      const socketEventHandlers: {
+        [key: string]: (data: any) => void;
+      } = {
+        'opponent-left': (game: JoinGameDto) => {
+          opponentLeft(game);
+          playgroundDispatch({ type: 'force-start' });
+        },
+        'move-complete': ({ scores, ...state }: PlaygroundState) => {
+          playgroundDispatch({ type: 'move', payload: { ...state, canMove: true } });
+          updateScores(scores);
+        },
+        'restart-made': () => {
+          playgroundDispatch({ type: 'force-start' });
+        },
+        'check-complete': (game: JoinGameDto | { error: boolean }) => {
+          if (
+            game &&
+            !(game as { error: boolean }).error &&
+            !(game as JoinGameDto).joiner
+          ) {
+            check(game as JoinGameDto);
+            open();
+            return;
+          }
 
-        navigate('/');
+          navigate('/');
+        },
+        'player-joined': (game: JoinGameDto) => {
+          join(game.joiner);
+        },
+      };
+      Object.keys(socketEventHandlers).forEach((event) => {
+        socket?.on(event, socketEventHandlers[event]);
       });
-      socket?.on('player-joined', (game: JoinGameDto) => {
-        join(game.joiner);
-      });
+
       if (!storedCode) {
         socket?.emit('check', { code });
       }
+      return () => {
+        Object.keys(socketEventHandlers).forEach((event) => {
+          socket?.off(event, socketEventHandlers[event]);
+        });
+      };
     }
-  }, [socket, storedCode, canMove]);
+  }, [socket, storedCode, playgroundDispatch]);
 
   const mark = useCallback(
     (i: number) => {
-      if (!winner && !cells[i] && canMove && socket) {
-        playgroundDispatch({
-          type: 'mark',
-          payload: {
-            idx: i,
-            localSign: players.local?.sign,
-          },
-        });
-        socket?.emit('move', {
-          code,
+      playgroundDispatch({
+        type: 'mark',
+        payload: {
           idx: i,
-          cells,
-          xIsNext,
-        });
-        setCanMove(false);
-      }
+          localSign: players.local?.sign,
+          canMove: false,
+          socket,
+          code: storedCode,
+        },
+      });
     },
-    [socket, cells, playgroundDispatch, canMove],
+    [socket, storedCode, playgroundDispatch],
   );
 
   const restart = useCallback(() => {
-    if (winner) {
-      socket?.emit('restart', { code });
-      playgroundDispatch({
-        type: 'start',
-      });
-    }
-  }, [playgroundDispatch, storedCode, winner]);
+    playgroundDispatch({
+      type: 'start',
+      payload: { socket, code: storedCode },
+    });
+  }, [socket, storedCode, playgroundDispatch]);
 
   return (
     <div className={`${className} playground-container`}>
       <div className="relative">
-        {(!players.remote ||
-          ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner && canMove)) && (
-          <div className="flex justify-center items-center absolute w-full h-full z-30 bac bg-opacity-80 bg-white">
-            <Loading show={true} />
-          </div>
-        )}
-        <div
-          className={`playground-content relative grid grid-cols-3 grid-rows-3 line-${line.perspective} line-${line.position}`}
-        >
-          {cells.map((value, i) => (
-            <Square value={value} onClick={mark} index={i} key={i} />
-          ))}
-        </div>
+        <Fallback canMove={canMove} players={players} xIsNext={xIsNext} winner={winner} />
+        <SquaresGrid line={line} onClick={mark} squares={cells} />
       </div>
 
       <Message xIsNext={xIsNext} winner={winner} restart={restart} players={players} />

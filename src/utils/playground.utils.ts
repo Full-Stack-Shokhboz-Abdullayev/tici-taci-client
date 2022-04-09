@@ -5,14 +5,40 @@ import { ReducerAction } from '../typings/Playground/interfaces/reducer.interfac
 export const playgroundReducer = (state: PlaygroundState, action: ReducerAction) => {
   switch (action.type) {
     case 'start':
+      if (state.winner) {
+        (action.payload as any).socket?.emit('restart', {
+          code: (action.payload as any).code,
+        });
+
+        return defaultPlaygroundState;
+      }
+      return state;
+    case 'force-start':
       return defaultPlaygroundState;
     case 'mark': {
-      const cells = [...state.cells];
-      cells[action.payload?.idx] = action.payload?.localSign;
-      return {
-        ...state,
-        cells,
-      };
+      if (
+        !state.winner &&
+        !state.cells[action.payload?.idx] &&
+        state.canMove &&
+        (action.payload as any).socket
+      ) {
+        const cells = [...state.cells];
+        cells[action.payload?.idx] = action.payload?.localSign;
+
+        (action.payload as any).socket?.emit('move', {
+          code: (action.payload as any).code,
+          idx: (action.payload as any).idx,
+          cells,
+          xIsNext: state.xIsNext,
+        });
+
+        return {
+          ...state,
+          cells,
+          canMove: action.payload?.canMove,
+        };
+      }
+      return state;
     }
     case 'move': {
       return {

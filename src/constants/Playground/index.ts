@@ -6,4 +6,5 @@ export const defaultPlaygroundState: PlaygroundState = {
   winner: null,
   line: {},
   scores: {},
+  canMove: true,
 };

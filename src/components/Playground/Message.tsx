@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, memo, useMemo } from 'react';
 
 import { PlayersState } from '../../typings/Playground/interfaces/index.interfaces';
 import { PlayerType } from '../../typings/Playground/types/player.type';
@@ -72,4 +72,4 @@ const Message: FC<MessageProps> = ({ winner, restart, players, xIsNext }) => {
   return <></>;
 };
 
-export default Message;
+export default memo(Message);
