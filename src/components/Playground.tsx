@@ -17,14 +17,8 @@ import Message from './Playground/Message';
 import SquaresGrid from './Playground/SquaresGrid';
 
 const Playground: FC<PlaygroundProps> = ({ className }) => {
-  const {
-    players,
-    join,
-    code: storedCode,
-    check,
-    opponentLeft,
-    updateScores,
-  } = useGameStore();
+  const { join, code: storedCode, check, opponentLeft, updateScores } = useGameStore();
+  const players = useGameStore((state) => state.players);
   const [{ cells, line, winner, xIsNext, canMove }, dispatch] = useReducer(
     playgroundReducer,
     defaultPlaygroundState,
@@ -85,6 +79,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
 
   const mark = useCallback(
     (i: number) => {
+      console.log('Local sign', players.local?.sign);
       dispatch({
         type: 'mark',
         payload: {
@@ -96,7 +91,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         },
       });
     },
-    [socket, storedCode, dispatch, players.local],
+    [socket, storedCode, dispatch],
   );
 
   const restart = useCallback(() => {
