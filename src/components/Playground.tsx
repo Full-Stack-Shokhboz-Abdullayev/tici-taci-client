@@ -83,7 +83,8 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
     }
   }, [socket, storedCode, dispatch]);
 
-  const mark = useCallback(
+  const mark =
+    // useCallback(
     (i: number) => {
       dispatch({
         type: 'mark',
@@ -95,9 +96,10 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
           code: storedCode,
         },
       });
-    },
-    [socket, storedCode, dispatch],
-  );
+    };
+  // ,
+  // [socket, storedCode, dispatch],
+  // );
 
   const restart = useCallback(() => {
     dispatch({
