@@ -40,10 +40,15 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
       return state;
     }
     case 'move': {
-      return {
-        ...state,
-        ...(action.payload as PlaygroundState),
-      };
+      const { cells, ...newState } = { ...(action.payload as PlaygroundState) };
+      if (JSON.stringify(cells) !== JSON.stringify(state.cells)) {
+        return {
+          ...state,
+          ...newState,
+          cells,
+        };
+      }
+      return state;
     }
     default:
       return state;
