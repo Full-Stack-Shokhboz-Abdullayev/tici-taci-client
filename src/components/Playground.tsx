@@ -4,13 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { defaultPlaygroundState } from '../constants/Playground';
 import { useSocket } from '../contexts/SocketProvider';
 import useModal from '../hooks/useModal';
+import { playgroundReducer } from '../reducers/playground.reducer';
 import useGameStore from '../store/game.store';
 import {
   PlaygroundProps,
   PlaygroundState,
 } from '../typings/Playground/interfaces/index.interfaces';
 import { JoinGameDto } from '../typings/shared/dto/join-game.dto';
-import { playgroundReducer } from '../utils/playground.utils';
 import JoinGameForm from './JoinGame/JoinGameForm';
 import Fallback from './Playground/Fallback';
 import Message from './Playground/Message';
@@ -27,9 +27,12 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
   );
   const socket = useSocket();
   const { code } = useParams() as { code: string };
-  const { open } = useModal(<JoinGameForm />);
-
   const navigate = useNavigate();
+  const { open } = useModal(<JoinGameForm />, {
+    onClose(): void {
+      navigate(`/`);
+    },
+  });
 
   useEffect(() => {
     if (socket) {
@@ -86,7 +89,6 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         : players.remote?.sign === 'X'
         ? 'O'
         : 'X';
-      console.log('LocalSign', localSign);
 
       dispatch({
         type: 'mark',

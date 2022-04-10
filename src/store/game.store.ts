@@ -21,6 +21,7 @@ interface Actions {
   check: (game: Partial<JoinGameDto>) => void;
   opponentLeft: (game: Partial<JoinGameDto>) => void;
   updateScores(scores: Scores): void;
+  empty: () => void;
 }
 
 const useGameStore = create<State & Actions>((set) => ({
@@ -59,6 +60,15 @@ const useGameStore = create<State & Actions>((set) => ({
         },
       };
     });
+  },
+
+  empty() {
+    set((state) => ({
+      ...state,
+      title: '',
+      code: '',
+      players: {},
+    }));
   },
 
   opponentLeft({ code, joiner, maker, title }) {

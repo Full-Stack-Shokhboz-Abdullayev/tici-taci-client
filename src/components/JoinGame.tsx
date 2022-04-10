@@ -13,7 +13,7 @@ const JoinGame: FC = () => {
   const [gameCode] = useInput('');
   const socket = useSocket();
   const { check } = useGameStore();
-  const { open } = useModal(<JoinGameForm />);
+  const { open } = useModal(<JoinGameForm />, {});
 
   useEffect(() => {
     socket?.on('check-complete', (game: JoinGameDto) => {

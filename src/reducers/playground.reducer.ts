@@ -58,15 +58,3 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
       return state;
   }
 };
-
-// maker creates game and waits with loading...
-// ⬇
-// joiner joins game
-// ⬇
-// maker's turn to make move (joiner is waiting)
-// ⬇
-// joiner's turn to make move (maker is waiting)
-// ⬇
-// ⬇
-// ⬇
-// someone wins and then game is closed
