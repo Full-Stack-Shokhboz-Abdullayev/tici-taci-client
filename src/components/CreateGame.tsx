@@ -5,7 +5,7 @@ import CreateGameForm from './CreateGame/CreateGameForm';
 import Button from './design/Button';
 
 const CreateGame: FC = () => {
-  const { open } = useModal(<CreateGameForm />);
+  const { open } = useModal(<CreateGameForm />, {});
 
   return (
     <div className="flex w-full sm:w-2/3 md:w-1/3 lg:w-1/3 m-6 md:m-0">

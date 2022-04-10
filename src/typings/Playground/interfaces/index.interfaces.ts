@@ -16,4 +16,5 @@ export interface PlaygroundState {
   scores: {
     [key: string]: number;
   };
+  canMove: boolean;
 }

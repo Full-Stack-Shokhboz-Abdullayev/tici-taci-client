@@ -1,8 +1,8 @@
-import { FC, memo, useRef } from 'react';
+import { FC, memo } from 'react';
 
-import O from '../assets/images/o.svg';
-import X from '../assets/images/x.svg';
-import { Nullish } from '../typings/shared/types/nullish.type';
+import O from '../../assets/images/o.svg';
+import X from '../../assets/images/x.svg';
+import { Nullish } from '../../typings/shared/types/nullish.type';
 
 interface SquareProps {
   value: Nullish<string>;
@@ -11,8 +11,7 @@ interface SquareProps {
 }
 
 const Square: FC<SquareProps> = ({ value, onClick, index }) => {
-  const renders = useRef(0);
-  console.log(renders.current++);
+  console.log('Square ' + index);
 
   return (
     <div

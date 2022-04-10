@@ -4,9 +4,9 @@ import Playground from '../components/Playground';
 import Scores from '../components/Playground/Scores';
 import useGameStore from '../store/game.store';
 
-window.onbeforeunload = function () {
-  return 'Leaving this page will reset the game!';
-};
+// window.onbeforeunload = function () {
+//   return 'Leaving this page will reset the game!';
+// };
 
 const GamePage: FC = () => {
   const { title } = useGameStore();

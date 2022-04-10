@@ -2,8 +2,18 @@ import { FC } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Modal from '../components/Modal';
+// import { useLocationChange } from '../hooks/useLocationChange';
 import GamePage from '../pages/Game.page';
 import HomePage from '../pages/Home.page';
+// import useGameStore from '../store/game.store';
+
+// const LocationChangeContext: FC = ({ children }) => {
+//   const empty = useGameStore((state) => state.empty);
+//   useLocationChange(() => {
+//     empty();
+//   });
+//   return <>{children}</>;
+// };
 
 const RouterContext: FC<{ navbar?: JSX.Element; footer?: JSX.Element }> = ({
   navbar,
@@ -11,6 +21,7 @@ const RouterContext: FC<{ navbar?: JSX.Element; footer?: JSX.Element }> = ({
 }) => {
   return (
     <Router>
+      {/* <LocationChangeContext> */}
       <Modal></Modal>
       {navbar}
       <div className="container sm:min-w-full px-10 sm:px-20 md:px-30 lg:px-60">
@@ -20,6 +31,7 @@ const RouterContext: FC<{ navbar?: JSX.Element; footer?: JSX.Element }> = ({
         </Routes>
       </div>
       {footer}
+      {/* </LocationChangeContext> */}
     </Router>
   );
 };
