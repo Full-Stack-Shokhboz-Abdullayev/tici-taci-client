@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 import { PlayersState } from '../../typings/Playground/interfaces/index.interfaces';
 import { Nullish } from '../../typings/shared/types/nullish.type';
@@ -10,8 +10,13 @@ const Fallback: FC<{
   canMove: boolean;
   winner: Nullish<string>;
 }> = ({ players, xIsNext, winner, canMove }) => {
+  useEffect(() => {
+    console.log((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner && canMove);
+  }, [canMove]);
+
   return !players.remote ||
-    ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner && canMove) ? (
+    ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner) ||
+    !canMove ? (
     <div className="flex justify-center items-center absolute w-full h-full z-30 bac bg-opacity-80 bg-white">
       <Loading show={true} />
     </div>

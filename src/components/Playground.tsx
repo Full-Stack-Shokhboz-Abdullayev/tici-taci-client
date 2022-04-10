@@ -25,7 +25,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
     opponentLeft,
     updateScores,
   } = useGameStore();
-  const [{ cells, line, winner, xIsNext, canMove }, playgroundDispatch] = useReducer(
+  const [{ cells, line, winner, xIsNext, canMove }, dispatch] = useReducer(
     playgroundReducer,
     defaultPlaygroundState,
   );
@@ -42,14 +42,14 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
       } = {
         'opponent-left': (game: JoinGameDto) => {
           opponentLeft(game);
-          playgroundDispatch({ type: 'force-start' });
+          dispatch({ type: 'force-start' });
         },
         'move-complete': ({ scores, ...state }: PlaygroundState) => {
-          playgroundDispatch({ type: 'move', payload: { ...state, canMove: true } });
+          dispatch({ type: 'move', payload: { ...state, canMove: true } });
           updateScores(scores);
         },
         'restart-made': () => {
-          playgroundDispatch({ type: 'force-start' });
+          dispatch({ type: 'force-start' });
         },
         'check-complete': (game: JoinGameDto | { error: boolean }) => {
           if (
@@ -81,11 +81,11 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         });
       };
     }
-  }, [socket, storedCode, playgroundDispatch]);
+  }, [socket, storedCode, dispatch]);
 
   const mark = useCallback(
     (i: number) => {
-      playgroundDispatch({
+      dispatch({
         type: 'mark',
         payload: {
           idx: i,
@@ -96,15 +96,15 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         },
       });
     },
-    [socket, storedCode, playgroundDispatch],
+    [socket, storedCode, dispatch],
   );
 
   const restart = useCallback(() => {
-    playgroundDispatch({
+    dispatch({
       type: 'start',
       payload: { socket, code: storedCode },
     });
-  }, [socket, storedCode, playgroundDispatch]);
+  }, [socket, storedCode, dispatch]);
 
   return (
     <div className={`${className} playground-container`}>

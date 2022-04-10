@@ -7,7 +7,7 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
     case 'start':
       if (state.winner) {
         setTimeout(() => {
-          (action.payload as any).socket?.emit('restart', {
+          (action.payload as any)?.socket?.emit('restart', {
             code: (action.payload as any).code,
           });
         });
@@ -17,17 +17,13 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
     case 'force-start':
       return defaultPlaygroundState;
     case 'mark': {
-      if (
-        !state.winner &&
-        !state.cells[action.payload?.idx] &&
-        state.canMove &&
-        (action.payload as any).socket
-      ) {
+      if (!state.winner && !state.cells[action.payload?.idx] && state.canMove) {
         const cells = [...state.cells];
         cells[action.payload?.idx] = action.payload?.localSign;
+        console.log('Mark working');
 
         setTimeout(() => {
-          (action.payload as any).socket?.emit('move', {
+          (action.payload as any)?.socket?.emit('move', {
             code: (action.payload as any).code,
             idx: (action.payload as any).idx,
             cells,
