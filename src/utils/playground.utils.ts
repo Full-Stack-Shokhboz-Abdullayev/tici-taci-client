@@ -6,10 +6,11 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
   switch (action.type) {
     case 'start':
       if (state.winner) {
-        (action.payload as any).socket?.emit('restart', {
-          code: (action.payload as any).code,
+        setTimeout(() => {
+          (action.payload as any).socket?.emit('restart', {
+            code: (action.payload as any).code,
+          });
         });
-
         return defaultPlaygroundState;
       }
       return state;
@@ -25,11 +26,13 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
         const cells = [...state.cells];
         cells[action.payload?.idx] = action.payload?.localSign;
 
-        (action.payload as any).socket?.emit('move', {
-          code: (action.payload as any).code,
-          idx: (action.payload as any).idx,
-          cells,
-          xIsNext: state.xIsNext,
+        setTimeout(() => {
+          (action.payload as any).socket?.emit('move', {
+            code: (action.payload as any).code,
+            idx: (action.payload as any).idx,
+            cells,
+            xIsNext: state.xIsNext,
+          });
         });
 
         return {
