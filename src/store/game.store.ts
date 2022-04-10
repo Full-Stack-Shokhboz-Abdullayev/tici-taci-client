@@ -78,7 +78,6 @@ const useGameStore = create<State & Actions>((set) => ({
   join(player) {
     set((state) => ({
       ...state,
-      code: state.code,
       players: {
         ...state.players,
         remote: {
