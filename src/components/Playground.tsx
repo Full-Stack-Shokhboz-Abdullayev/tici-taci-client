@@ -75,11 +75,11 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
       if (!storedCode) {
         socket?.emit('check', { code });
       }
-      return () => {
-        Object.keys(socketEventHandlers).forEach((event) => {
-          socket?.off(event, socketEventHandlers[event]);
-        });
-      };
+      // return () => {
+      //   Object.keys(socketEventHandlers).forEach((event) => {
+      //     socket?.off(event, socketEventHandlers[event]);
+      //   });
+      // };
     }
   }, [socket, storedCode, dispatch]);
 
