@@ -2,10 +2,10 @@ import create from 'zustand';
 
 import { PlayersState } from '../typings/Playground/interfaces/index.interfaces';
 import { PlayerType } from '../typings/Playground/types/player.type';
-import { CreateGameDto } from '../typings/shared/dto/create-game.dto';
-import { JoinGameDto } from '../typings/shared/dto/join-game.dto';
-import { PlayerDto } from '../typings/shared/dto/player.dto';
+import { CreateGame } from '../typings/shared/types/create-game.type';
+import { JoinGame } from '../typings/shared/types/join-game.type';
 import { Nullish } from '../typings/shared/types/nullish.type';
+import { PlayerDto } from '../typings/shared/types/player.type';
 
 interface State {
   title: Nullish<string>;
@@ -16,10 +16,10 @@ interface State {
 type Scores = { [key: string]: number };
 
 interface Actions {
-  create: (payload: CreateGameDto) => void;
+  create: (payload: CreateGame) => void;
   join: (player: PlayerDto) => void;
-  check: (game: Partial<JoinGameDto>) => void;
-  opponentLeft: (game: Partial<JoinGameDto>) => void;
+  check: (game: Partial<JoinGame>) => void;
+  opponentLeft: (game: Partial<JoinGame>) => void;
   updateScores(scores: Scores): void;
   empty: () => void;
 }

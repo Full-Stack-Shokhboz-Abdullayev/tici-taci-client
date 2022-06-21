@@ -3,7 +3,7 @@ import { FC, memo, useMemo } from 'react';
 import { PlayersState } from '../../typings/Playground/interfaces/index.interfaces';
 import { PlayerType } from '../../typings/Playground/types/player.type';
 import { Nullish } from '../../typings/shared/types/nullish.type';
-import Button from '../design/Button';
+import Button from '../core/design/Button';
 
 interface MessageProps {
   winner: Nullish<string>;
@@ -50,7 +50,6 @@ const Message: FC<MessageProps> = ({ winner, restart, players, xIsNext }) => {
       }
       return '';
     }, [players, winner]);
-    console.log(winnerPlayer);
 
     return (
       <div className="flex justify-center mt-2 flex-col">

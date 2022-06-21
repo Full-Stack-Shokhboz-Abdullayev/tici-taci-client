@@ -1,10 +1,12 @@
 import { PlaygroundState } from '../../typings/Playground/interfaces/index.interfaces';
 
-export const defaultPlaygroundState: PlaygroundState = {
+export const defaultPlaygroundState: (xIsNext: boolean) => PlaygroundState = (
+  xIsNext,
+) => ({
   cells: Array(9).fill(null),
-  xIsNext: true,
+  xIsNext,
   winner: null,
   line: {},
   scores: {},
   canMove: true,
-};
+});

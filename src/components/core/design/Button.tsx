@@ -7,7 +7,7 @@ const Button: FC<
 > = ({ children, className, styleType, ...props }) => {
   return (
     <button
-      className={`${className} p-3 rounded custom-button-${styleType} transition-all`}
+      className={`${className} p-3 rounded custom-button-${styleType} transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
       {...props}
     >
       {children}

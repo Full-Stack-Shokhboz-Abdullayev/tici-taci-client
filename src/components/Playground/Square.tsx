@@ -11,8 +11,6 @@ interface SquareProps {
 }
 
 const Square: FC<SquareProps> = ({ value, onClick, index }) => {
-  console.log('Square ' + index);
-
   return (
     <div
       onClick={() => onClick(index)}

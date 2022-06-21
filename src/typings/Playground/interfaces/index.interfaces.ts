@@ -1,5 +1,5 @@
-import { PlayerDto } from '../../shared/dto/player.dto';
 import { Nullish } from '../../shared/types/nullish.type';
+import { PlayerDto } from '../../shared/types/player.type';
 import { PlayerType } from '../types/player.type';
 import { Line } from './calculate-winner.interfaces';
 

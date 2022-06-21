@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
 import useModal from '../hooks/useModal';
+import Button from './core/design/Button';
 import CreateGameForm from './CreateGame/CreateGameForm';
-import Button from './design/Button';
 
 const CreateGame: FC = () => {
   const { open } = useModal(<CreateGameForm />, {});

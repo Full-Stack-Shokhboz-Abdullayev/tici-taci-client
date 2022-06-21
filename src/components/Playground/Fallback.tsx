@@ -1,8 +1,8 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 
 import { PlayersState } from '../../typings/Playground/interfaces/index.interfaces';
 import { Nullish } from '../../typings/shared/types/nullish.type';
-import Loading from '../design/Loading';
+import Loading from '../core/design/Loading';
 
 const Fallback: FC<{
   players: Partial<PlayersState>;
@@ -10,10 +10,6 @@ const Fallback: FC<{
   canMove: boolean;
   winner: Nullish<string>;
 }> = ({ players, xIsNext, winner, canMove }) => {
-  useEffect(() => {
-    console.log((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner && canMove);
-  }, [canMove]);
-
   return !players.remote ||
     ((players.local?.sign === 'O' ? xIsNext : !xIsNext) && !winner) ||
     !canMove ? (

@@ -10,7 +10,7 @@ import {
   PlaygroundProps,
   PlaygroundState,
 } from '../typings/Playground/interfaces/index.interfaces';
-import { JoinGameDto } from '../typings/shared/dto/join-game.dto';
+import { JoinGame } from '../typings/shared/types/join-game.type';
 import JoinGameForm from './JoinGame/JoinGameForm';
 import Fallback from './Playground/Fallback';
 import Message from './Playground/Message';
@@ -23,7 +23,7 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
 
   const [{ cells, line, winner, xIsNext, canMove }, dispatch] = useReducer(
     playgroundReducer,
-    defaultPlaygroundState,
+    defaultPlaygroundState(true),
   );
   const socket = useSocket();
   const { code } = useParams() as { code: string };
@@ -35,52 +35,48 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
   });
 
   useEffect(() => {
-    if (socket) {
-      const socketEventHandlers: {
-        [key: string]: (data: any) => void;
-      } = {
-        'opponent-left': (game: JoinGameDto) => {
-          opponentLeft(game);
-          dispatch({ type: 'force-start' });
-        },
-        'move-complete': ({ scores, ...state }: PlaygroundState) => {
-          dispatch({ type: 'move', payload: { ...state, canMove: true } });
-          updateScores(scores);
-        },
-        'restart-made': () => {
-          dispatch({ type: 'force-start' });
-        },
-        'check-complete': (game: JoinGameDto | { error: boolean }) => {
-          if (
-            game &&
-            !(game as { error: boolean }).error &&
-            !(game as JoinGameDto).joiner
-          ) {
-            check(game as JoinGameDto);
-            open();
-            return;
-          }
+    const socketEventHandlers: {
+      [key: string]: (data: any) => void;
+    } = {
+      'opponent-left': (game: JoinGame) => {
+        opponentLeft(game);
+        dispatch({ type: 'start' });
+      },
+      'move-complete': ({ scores, ...state }: PlaygroundState) => {
+        dispatch({ type: 'move', payload: { ...state, canMove: true } });
+        updateScores(scores);
+      },
+      'restart-made': ({ xIsNext }: { xIsNext: boolean }) => {
+        console.log(xIsNext);
 
-          navigate('/');
-        },
-        'player-joined': (game: JoinGameDto) => {
-          join(game.joiner);
-        },
-      };
-      Object.keys(socketEventHandlers).forEach((event) => {
-        socket?.on(event, socketEventHandlers[event]);
-      });
+        dispatch({ type: 'start', payload: { xIsNext } });
+      },
+      'check-complete': (game: JoinGame | { error: boolean }) => {
+        if (game && !(game as { error: boolean }).error && !(game as JoinGame).joiner) {
+          check(game as JoinGame);
+          open();
+          return;
+        }
 
-      if (!storedCode) {
-        socket?.emit('check', { code });
-      }
-      return () => {
-        Object.keys(socketEventHandlers).forEach((event) => {
-          socket?.off(event, socketEventHandlers[event]);
-        });
-      };
+        navigate('/');
+      },
+      'player-joined': (game: JoinGame) => {
+        join(game.joiner);
+      },
+    };
+    Object.keys(socketEventHandlers).forEach((event) => {
+      socket.on(event, socketEventHandlers[event]);
+    });
+
+    if (!storedCode) {
+      socket.emit('check', { code });
     }
-  }, [socket, storedCode, dispatch]);
+    return () => {
+      Object.keys(socketEventHandlers).forEach((event) => {
+        socket.off(event, socketEventHandlers[event]);
+      });
+    };
+  }, [storedCode, dispatch]);
 
   const mark = useCallback(
     (i: number) => {
@@ -101,15 +97,14 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         },
       });
     },
-    [socket, storedCode, dispatch],
+    [storedCode, dispatch],
   );
 
   const restart = useCallback(() => {
-    dispatch({
-      type: 'start',
-      payload: { socket, code: storedCode },
+    socket.emit('restart', {
+      code: storedCode,
     });
-  }, [socket, storedCode, dispatch]);
+  }, [storedCode]);
 
   return (
     <div className={`${className} playground-container`}>

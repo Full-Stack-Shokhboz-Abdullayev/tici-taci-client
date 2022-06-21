@@ -1,37 +1,68 @@
-import { FC, FormEventHandler, useEffect } from 'react';
+import { createValidator } from 'class-validator-formik';
+import { useFormik } from 'formik';
+import { FC, useCallback, useEffect } from 'react';
 
 import { useSocket } from '../contexts/SocketProvider';
-import useInput from '../hooks/useInput';
+import { CheckGameDto } from '../dto/check-game.dto';
 import useModal from '../hooks/useModal';
 import useGameStore from '../store/game.store';
-import { JoinGameDto } from '../typings/shared/dto/join-game.dto';
-import Button from './design/Button';
-import Input from './design/Input';
+import { JoinGame as JoinGameType } from '../typings/shared/types/join-game.type';
+import Button from './core/design/Button';
+import Input from './core/design/Input';
 import JoinGameForm from './JoinGame/JoinGameForm';
 
+const notFound = 'Game not found!';
+
 const JoinGame: FC = () => {
-  const [gameCode] = useInput('');
   const socket = useSocket();
   const { check } = useGameStore();
   const { open } = useModal(<JoinGameForm />, {});
 
+  const submit = useCallback((values: CheckGameDto) => {
+    socket.emit('check', {
+      code: values.code,
+    });
+  }, []);
+
+  const {
+    errors,
+    touched,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    resetForm,
+    setFieldError,
+    isSubmitting,
+    setSubmitting,
+  } = useFormik({
+    initialValues: new CheckGameDto(),
+    validate: createValidator(CheckGameDto),
+    onSubmit: submit,
+  });
+
   useEffect(() => {
-    socket?.on('check-complete', (game: JoinGameDto) => {
-      if (game) {
-        check(game);
+    const events: Record<string, any> = {
+      'check-complete': (game: JoinGameType) => {
+        if (game) {
+          resetForm();
+          check(game);
+          open();
+        }
+        setFieldError('code', notFound);
 
-        open();
-      }
+        setSubmitting(false);
+      },
+    };
+
+    Object.keys(events).forEach((event) => {
+      socket.on(event, events[event]);
     });
-  }, [socket]);
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-
-    socket?.emit('check', {
-      code: gameCode.value,
-    });
-  };
+    return () => {
+      Object.keys(events).forEach((event) => {
+        socket.off(event, events[event]);
+      });
+    };
+  }, []);
 
   return (
     <form
@@ -43,9 +74,21 @@ const JoinGame: FC = () => {
         styleType="yellow"
         className="my-2 text-center"
         placeholder="Enter the game code!"
-        {...gameCode}
+        onBlur={handleBlur}
+        onChange={handleChange}
+        id="code"
       ></Input>
-      <Button styleType="yellow" className="my-2" type="submit">
+      <span className="text-red-600 text-center">
+        {errors.code && touched.code && errors.code}
+      </span>
+      <Button
+        disabled={
+          ((!!errors.code && !!touched.code) || isSubmitting) && errors.code !== notFound
+        }
+        styleType="yellow"
+        className="my-2"
+        type="submit"
+      >
         Enter
       </Button>
     </form>
