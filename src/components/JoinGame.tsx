@@ -1,3 +1,4 @@
+import { validate } from 'class-validator';
 import { createValidator } from 'class-validator-formik';
 import { useFormik } from 'formik';
 import { FC, useCallback, useEffect } from 'react';
@@ -6,12 +7,11 @@ import { useSocket } from '../contexts/SocketProvider';
 import { CheckGameDto } from '../dto/check-game.dto';
 import useModal from '../hooks/useModal';
 import useGameStore from '../store/game.store';
+import { FormError } from '../typings/shared/types/form-error.type';
 import { JoinGame as JoinGameType } from '../typings/shared/types/join-game.type';
 import Button from './core/design/Button';
 import Input from './core/design/Input';
 import JoinGameForm from './JoinGame/JoinGameForm';
-
-const notFound = 'Game not found!';
 
 const JoinGame: FC = () => {
   const socket = useSocket();
@@ -31,9 +31,10 @@ const JoinGame: FC = () => {
     handleChange,
     handleSubmit,
     resetForm,
-    setFieldError,
     isSubmitting,
+    values,
     setSubmitting,
+    setErrors,
   } = useFormik({
     initialValues: new CheckGameDto(),
     validate: createValidator(CheckGameDto),
@@ -43,13 +44,13 @@ const JoinGame: FC = () => {
   useEffect(() => {
     const events: Record<string, any> = {
       'check-complete': (game: JoinGameType) => {
-        if (game) {
-          resetForm();
-          check(game);
-          open();
-        }
-        setFieldError('code', notFound);
-
+        resetForm();
+        check(game);
+        open();
+        setSubmitting(false);
+      },
+      exception: ({ messages }: FormError) => {
+        setErrors(messages);
         setSubmitting(false);
       },
     };
@@ -76,15 +77,14 @@ const JoinGame: FC = () => {
         placeholder="Enter the game code!"
         onBlur={handleBlur}
         onChange={handleChange}
+        value={values.code}
         id="code"
       ></Input>
       <span className="text-red-600 text-center">
         {errors.code && touched.code && errors.code}
       </span>
       <Button
-        disabled={
-          ((!!errors.code && !!touched.code) || isSubmitting) && errors.code !== notFound
-        }
+        disabled={(!!errors.code && !!touched.code) || isSubmitting}
         styleType="yellow"
         className="my-2"
         type="submit"

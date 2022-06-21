@@ -10,6 +10,7 @@ import { CreateGameDto } from '../../dto/create-game.dto';
 import useGameStore from '../../store/game.store';
 import useModalStore from '../../store/modal.store';
 import { CreateGame } from '../../typings/shared/types/create-game.type';
+import { FormError } from '../../typings/shared/types/form-error.type';
 import Button from '../core/design/Button';
 import Input from '../core/design/Input';
 import SelectSwitch from '../core/design/SelectSwitch';
@@ -28,7 +29,7 @@ const signs = [
 ];
 
 const CreateGameForm: FC = () => {
-  const { setIsOpen } = useModalStore();
+  const { setIsOpen, isOpen } = useModalStore();
   const socket = useSocket();
   const { create } = useGameStore();
   const navigate = useNavigate();
@@ -52,8 +53,9 @@ const CreateGameForm: FC = () => {
     errors,
     touched,
     isSubmitting,
-    setSubmitting,
     setFieldValue,
+    setErrors,
+    setSubmitting,
   } = useFormik({
     initialValues: new CreateGameDto(),
     onSubmit: submit,
@@ -65,9 +67,12 @@ const CreateGameForm: FC = () => {
       'create-complete': (data: CreateGame) => {
         create(data);
         setIsOpen(false);
-        setSubmitting(false);
         resetForm();
         navigate('/game/' + data.code);
+      },
+      exception: ({ messages }: FormError) => {
+        setErrors(messages);
+        setSubmitting(false);
       },
     };
 
@@ -80,6 +85,10 @@ const CreateGameForm: FC = () => {
       });
     };
   }, []);
+
+  useEffect(() => {
+    isOpen && resetForm();
+  }, [isOpen]);
 
   return (
     <form onSubmit={handleSubmit}>

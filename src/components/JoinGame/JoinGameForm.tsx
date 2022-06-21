@@ -7,11 +7,12 @@ import { useSocket } from '../../contexts/SocketProvider';
 import { JoinGameFormDto } from '../../dto/join-game.dto';
 import useGameStore from '../../store/game.store';
 import useModalStore from '../../store/modal.store';
+import { FormError } from '../../typings/shared/types/form-error.type';
 import Button from '../core/design/Button';
 import Input from '../core/design/Input';
 
 const JoinGameForm: FC = () => {
-  const { setIsOpen } = useModalStore();
+  const { setIsOpen, isOpen } = useModalStore();
   const socket = useSocket();
   const { check, code, title } = useGameStore();
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ const JoinGameForm: FC = () => {
     handleSubmit,
     handleBlur,
     handleChange,
+    setErrors,
+    setSubmitting,
     values,
     errors,
     touched,
@@ -43,10 +46,14 @@ const JoinGameForm: FC = () => {
   useEffect(() => {
     const events: Record<string, any> = {
       'join-complete': (data: any) => {
+        resetForm();
         check(data);
         setIsOpen(false);
-        resetForm();
         navigate('/game/' + data.code);
+      },
+      exception: ({ messages }: FormError) => {
+        setErrors(messages);
+        setSubmitting(false);
       },
     };
 
@@ -60,6 +67,10 @@ const JoinGameForm: FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    isOpen && resetForm();
+  }, [isOpen]);
+
   return (
     <form onSubmit={handleSubmit}>
       <h3 className="text-2xl text-center my-2">Join The Game - {title}!</h3>
@@ -69,6 +80,7 @@ const JoinGameForm: FC = () => {
           <Input
             onBlur={handleBlur}
             onChange={handleChange}
+            value={values.name}
             id="name"
             styleType="black"
             className="w-full"
