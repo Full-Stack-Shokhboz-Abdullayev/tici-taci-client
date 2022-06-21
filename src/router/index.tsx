@@ -18,7 +18,7 @@ const RouteChangeDetector: (props: {
 function useEmptyGame(gamepath: string) {
   const empty = useGameStore((state) => state.empty);
   return (location: Location) => {
-    if (location.pathname.startsWith(gamepath)) {
+    if (!location.pathname.startsWith(gamepath)) {
       empty();
     }
   };
