@@ -1,4 +1,3 @@
-import { validate } from 'class-validator';
 import { createValidator } from 'class-validator-formik';
 import { useFormik } from 'formik';
 import { FC, useCallback, useEffect } from 'react';
