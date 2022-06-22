@@ -3,7 +3,7 @@ import { DetailedHTMLProps, FC, InputHTMLAttributes } from 'react';
 const Input: FC<
   DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
     styleType: 'black' | 'yellow';
-    innerRef: any;
+    innerRef?: any;
   }
 > = ({ children, className, styleType, innerRef, ...props }) => {
   return (
