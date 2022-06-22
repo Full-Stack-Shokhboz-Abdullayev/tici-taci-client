@@ -44,7 +44,7 @@ export const ShareGameComponent: FC<{ gameLink: string }> = ({ gameLink }) => {
 
   return (
     <div className="flex justify-center items-center my-3 w-full">
-      <div className="relative  w-3/4 flex items-center justify-center">
+      <div className="relative w-full sm:w-[450px] flex items-center justify-center">
         <Input
           readOnly
           innerRef={inp}
