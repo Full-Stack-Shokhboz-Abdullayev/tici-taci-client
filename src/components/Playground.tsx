@@ -47,13 +47,17 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
         updateScores(scores);
       },
       'restart-made': ({ xIsNext }: { xIsNext: boolean }) => {
-        console.log(xIsNext);
-
         dispatch({ type: 'start', payload: { xIsNext } });
       },
       'check-complete': (game: JoinGame | { error: boolean }) => {
         if (game && !(game as { error: boolean }).error && !(game as JoinGame).joiner) {
           check(game as JoinGame);
+          dispatch({
+            type: 'flip',
+            payload: {
+              xIsNext: (game as JoinGame).flip,
+            },
+          });
           open();
           return;
         }
@@ -62,6 +66,12 @@ const Playground: FC<PlaygroundProps> = ({ className }) => {
       },
       'player-joined': (game: JoinGame) => {
         join(game.joiner);
+        dispatch({
+          type: 'flip',
+          payload: {
+            xIsNext: game.flip,
+          },
+        });
       },
     };
     Object.keys(socketEventHandlers).forEach((event) => {

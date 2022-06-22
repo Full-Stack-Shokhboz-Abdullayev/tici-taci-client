@@ -37,6 +37,13 @@ export const playgroundReducer = (state: PlaygroundState, action: ReducerAction)
         ...(action.payload as PlaygroundState),
       };
     }
+    case 'flip':
+      console.log('fliiip');
+
+      return {
+        ...state,
+        xIsNext: (action.payload as Pick<PlaygroundState, 'xIsNext'>).xIsNext,
+      };
     default:
       return state;
   }

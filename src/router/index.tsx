@@ -2,6 +2,7 @@ import { FC, ReactNode } from 'react';
 import { BrowserRouter as Router, Location, Route, Routes } from 'react-router-dom';
 
 import Modal from '../components/Modal';
+import { useSocket } from '../contexts/SocketProvider';
 import { useLocationChange } from '../hooks/useLocationChange';
 import GamePage from '../pages/Game.page';
 import HomePage from '../pages/Home.page';
@@ -17,9 +18,14 @@ const RouteChangeDetector: (props: {
 
 function useEmptyGame(gamepath: string) {
   const empty = useGameStore((state) => state.empty);
+  const socket = useSocket();
   return (location: Location) => {
     if (!location.pathname.startsWith(gamepath)) {
+      socket.disconnect();
       empty();
+      setTimeout(() => {
+        socket.connect();
+      });
     }
   };
 }
